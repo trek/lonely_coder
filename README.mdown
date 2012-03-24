@@ -40,6 +40,12 @@ How does it work?
 -----------------------------
 You'll need an OKCupid account (it's free) because most of the site is behind authentication.  You can create a new connection to the site.
 
+Install as a gem
+
+    gem install lonely_coder
+
+Use your account
+
     require 'lonely_coder'
     okc = OKCupid.new('yourusername', 'yourpassword')
     
