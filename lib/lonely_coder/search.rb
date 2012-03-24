@@ -10,6 +10,11 @@ class OKCupid
     
     attr_reader :filters
     
+    def self.location_id_for(query)
+      uri = URI("http://www.okcupid.com/locquery?func=query&query=#{URI.encode(query)}")
+      JSON.parse(Net::HTTP.get(uri))['results'][0]['locid'].to_s
+    end
+    
     def initialize(options, browser = Mechanize.new)
       @browser = browser
       options = defaults.merge(options)

@@ -24,6 +24,10 @@ class OKCupid
   def self.strip(str)
     str.gsub(WhiteSpace, ' ').strip
   end
+  
+  def love(n=20)
+    ' ♥ ' * n
+  end
 end
 
 require 'active_support/core_ext/string/inflections'
