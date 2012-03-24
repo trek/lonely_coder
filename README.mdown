@@ -1,0 +1,53 @@
+Lonely Coder
+===================
+
+    ,d88b.d88b,
+    88888888888
+    `Y8888888Y'
+      `Y888Y'
+        `Y'
+        
+Lonely coder seeks nice boy
+-----------------------------
+    require 'lonely_coder'
+    okc = OKCupid.new('thetrek','thisisntmypasswordweirdo')
+    
+    sweet_guys = []
+    
+    ['Ann Arbor, MI', 'New York, New York', 
+    'Chicago, Illinois', 'San Francisco, CA'].each do |maybe_here|
+      sweet_guys += okc.search({
+        :min_age => 25,
+        :max_age => 35, # just someone around my age, yo
+        :gentation => 'Guys who like guys', # don't hate
+        :order_by => 'Match %', # I want us to get along
+        :match_limit => 80, # let's make it last
+        :last_login => 'last month',
+        :location => maybe_here
+        :radius => 25, # acceptable values are 25, 50, 100, 250, 500, nil
+        :require_photo => true, # I like a goofy smile
+        :relationship_status => 'single' # the heart aches, but not for friends
+      }).results
+    end
+    
+    sweet_guys.count # oof, 812. Let the coffee dates begin!
+    
+What is this nonsense?
+-----------------------------
+A ruby gem for interacting with [OKCupid](http://www.okcupid.com/). OKCupid doesn't actually have an API, so we use mechanize to interact with the site. Screen scraping isn't terribly fast, but it's pretty zippy compared to the other option – doing nothing.
+
+How does it work?
+-----------------------------
+You'll need an OKCupid account (it's free) because most of the site is behind authentication.  You can create a new connection to the site.
+
+    require 'lonely_coder'
+    okc = OKCupid.new('yourusername', 'yourpassword')
+    
+Once you have a connection you can check out a person's profile
+    
+    trek = okc.profile_for('thetrek')
+    trek.match # => 99. Damn, he's pretty sweet
+    trek.location # => 'Ann Arbor, Michigan'
+    `open #{trek.profile_thumb_urls.first}` # HOT. DAMN.
+
+Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `single`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
