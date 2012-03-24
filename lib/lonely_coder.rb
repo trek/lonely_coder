@@ -7,8 +7,7 @@
 #             `Y888Y'
 #               `Y'       - trek
 #
-require 'bundler'
-Bundler.require(:default)
+require 'mechanize'
 
 class OKCupid
   BaseUrl = 'http://www.okcupid.com'

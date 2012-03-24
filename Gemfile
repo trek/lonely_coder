@@ -1,7 +1,5 @@
 source :rubygems
-
-gem 'mechanize'
-gem 'activesupport'
+gemspec
 
 group :test do
   gem 'rspec'
