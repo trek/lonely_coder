@@ -51,3 +51,8 @@ Once you have a connection you can check out a person's profile
     `open #{trek.profile_thumb_urls.first}` # HOT. DAMN.
 
 Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `single`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
+
+What if things don't go well
+-----------------------------
+
+    okc.love(1000) # ♥ 
