@@ -91,6 +91,7 @@ class OKCupid
         OKCupid::Profile.from_search_result(node)
       end
       @browser.pluggable_parser.html = Mechanize::Page
+      self
     end
     
     def url
