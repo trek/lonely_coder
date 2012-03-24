@@ -52,6 +52,20 @@ Once you have a connection you can check out a person's profile
 
 Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `single`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
 
+If you don't have particular username in mind, you can search. Check `lib/magic_constants.rb` for the crazy [Magic Numbers](http://en.wikipedia.org/wiki/Magic_number_(programming\)).
+
+    search = okc.search({
+      :min_age => 18,
+      :max_age => 99,
+      :gentation => 'guys who like guys',
+      :ethnicity => ['human']
+    }) # search object
+  
+    # fires the loading of the first 10, but only limited profiles. If you'd like full
+    # deets, use okc.profile_for with a results username.
+    search.results
+    search.load_next_page # loads the next 10 results
+
 What if things don't go well
 -----------------------------
 
