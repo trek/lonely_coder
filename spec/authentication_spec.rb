@@ -14,4 +14,13 @@ describe 'Authentication' do
       auth.success?.should == false
     end
   end
+
+  
+  it "restores Mechanize::Page as a parser after authenticating" do
+    @browser = Mechanize.new
+    VCR.use_cassette('successful_authentication', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
+      auth = OKCupid::Authentication.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'], @browser)
+    end
+    @browser.pluggable_parser['text/html'].should == Mechanize::Page
+  end
 end
