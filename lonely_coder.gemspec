@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{}
   s.description = %q{}
 
-  s.add_dependency 'mechanize', '>= 2.0.0'
+  s.add_dependency 'mechanize', '= 2.0.1'
   s.add_dependency 'activesupport', '>= 3.2.1'
 
   s.post_install_message = %q{
