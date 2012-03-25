@@ -126,7 +126,7 @@ end
 
 describe "Profile from search result" do
   before(:each) do
-    VCR.use_cassette('search_by_filters', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
+    VCR.use_cassette('load_profile_from_search', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
       @profile = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD']).search({
         gentation: 'girls who like guys'
       }).results.first
@@ -134,23 +134,23 @@ describe "Profile from search result" do
   end
   
   it "has a username" do
-    @profile.username.should == 'a2girl77'
+    @profile.username.should == 'Misha862'
   end
   
   it "has an age" do
-    @profile.age.should == '34'
+    @profile.age.should == '35'
   end
     
   it "has a match %" do
-    @profile.match.should == 92
+    @profile.match.should == 95
   end
   
   it "has a friend %" do
-    @profile.friend.should == 82
+    @profile.friend.should == 73
   end
   
   it "has an enemy %" do
-    @profile.enemy.should == 0
+    @profile.enemy.should == 4
   end
   
   it "has a location" do
@@ -158,7 +158,7 @@ describe "Profile from search result" do
   end
   
   it "has a small avatar url" do
-    @profile.small_avatar_url.should == 'http://ak0.okccdn.com/php/load_okc_image.php/images/82x82/82x82/126x67/497x439/2/5607892676107173868.jpeg'
+    @profile.small_avatar_url.should == 'http://ak2.okccdn.com/php/load_okc_image.php/images/82x82/82x82/14x56/323x365/2/853930758706783150.jpeg'
   end
   
   it "has a sex" do

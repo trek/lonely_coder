@@ -22,23 +22,62 @@ class OKCupid
     end
     
     def parse(options)
-      combine_ages(options)
       check_for_required_options(options)
-      remove_match_limit(options)
+      
+      options[:age] = combine_ages(options)
+      
       
       @filters = []
+      @parameters = []
+      
       options.each do |name,value|
-        
-        if OKCupid.const_defined?("#{name.to_s.camelize}Filter")
-          @filters << OKCupid.const_get("#{name.to_s.camelize}Filter").new(name, value)
-        else
-          @filters << Filter.new(name, value)
-        end
+        self.send("add_#{name}_option", value)
+        # if OKCupid.const_defined?("#{name.to_s.camelize}Filter")
+        #   @filters << OKCupid.const_get("#{name.to_s.camelize}Filter").new(name, value)
+        # else
+        #   @filters << Filter.new(name, value)
+        # end
       end
     end
     
-    def remove_match_limit(options)
-      @match_limit = options.delete(:match_limit)
+    def add_order_by_option(value)
+      @parameters << OrderByParameter.new(value)
+    end
+    
+    def add_last_login_option(value)
+      @filters << Filter.new('last_login', value)
+    end
+    
+    def add_location_option(value)
+      @parameters << LocationParameter.new(value)
+    end
+    
+    def add_radius_option(value)
+      @filters << RadiusFilter.new('radius', value)
+    end
+    
+    def add_require_photo_option(value)
+      @filters << RequirePhotoFilter.new('require_photo', value)
+    end
+    
+    def add_relationship_status_option(value)
+      @filters << Filter.new('relationship_status', value)
+    end
+    
+    def add_gentation_option(value)
+      @filters << Filter.new('gentation', value)
+    end
+    
+    def add_age_option(value)
+      @filters << AgeFilter.new('age', value)
+    end
+    
+    def add_pagination_option(value)
+      @parameters << @pagination = Paginator.new(value)
+    end
+    
+    def add_match_limit_option(value)
+      # TODO.
     end
     
     def check_for_required_options(options)
@@ -63,6 +102,10 @@ class OKCupid
     # relationship_status 'single'
     def defaults
       {
+        :pagination => {
+          :page => 1,
+          :per_page => 10
+        },
         :match_limit => 80,
         :min_age => 18,
         :max_age => 99,
@@ -78,24 +121,87 @@ class OKCupid
     def results
       return @results if @results
       
-      page = @browser.get(url)
+      @browser.pluggable_parser.html = SearchPaginationParser
+      page = @browser.get(ajax_url)
+      
       @results = page.search('.match_row').collect do |node|
         OKCupid::Profile.from_search_result(node)
       end
+      
+      @browser.pluggable_parser.html = Mechanize::Page
+      
+      @results
+    end
+    
+    # no idea what the following parameters do. They don't appear to have 
+    # an effect:
+    # sort_type=0
+    # fromWhoOnline=0
+    # update_prefs=1
+    # using_saved_search=0
+    # mygender=m
+    # no idea what the following parameters do, but without them, the search
+    # behaves erratically
+    # &timekey=1
+    # &custom_search=0
+    def magic_params_not_truly_understood
+      "timekey=1&custom_search=0"
     end
     
     def load_next_page
       @browser.pluggable_parser.html = SearchPaginationParser
-      page = @browser.get("#{url}&low=11&count=10&ajax_load=1")
+      
+      page = @browser.get("#{ajax_url}&#{@pagination.next.to_param}")
+      
       @results += page.search('.match_row').collect do |node|
         OKCupid::Profile.from_search_result(node)
       end
+      
       @browser.pluggable_parser.html = Mechanize::Page
+      
       self
     end
     
     def url
-      '/match?' + filters.compact.to_enum(:each_with_index).map {|filter,index| filter.to_param(index+1)}.join('&')
+      "/match?#{filters_as_query}&#{parameters_as_query}&#{magic_params_not_truly_understood}"
+    end
+    
+    def ajax_url
+      "#{url}&ajax_load=1"
+    end
+    
+    def parameters_as_query
+      @parameters.collect {|param| param.to_param }.join('&')
+    end
+    
+    def filters_as_query
+      filters.compact.to_enum(:each_with_index).map {|filter,index| filter.to_param(index+1)}.join('&')
+    end
+  end
+  
+  # used to create the pagination part of a search url:
+  # low=1&count=10&ajax_load=1
+  # where low is the start value
+  # count is the number of items per page
+  class Paginator
+    attr_reader :page, :per_page
+    
+    def initialize(options)
+      @per_page = options[:per_page]
+      @page = options[:page]
+    end
+    
+    def low
+      @low = ((@page - 1) * @per_page) + 1
+    end
+    
+    def next
+      @page +=1
+      self
+    end
+    
+    def to_param
+      "low=#{low}&count=#{@per_page}"
     end
   end
   
@@ -137,13 +243,12 @@ class OKCupid
     end
   end
   
-  class LocationFilter < Filter
-    def lookup(value)
-      ''
+  class LocationParameter
+    def initialize(value)
+      @value = value
     end
     
-    def to_param(n)
-      
+    def to_param
       # to do: 'anywhere' needs to remove the radius filter
       if @value.is_a?(String)
         if @value.downcase == 'near me'
@@ -156,24 +261,18 @@ class OKCupid
       end
     end
   end
-  
-  class OrderByFilter < Filter
-    def to_param(n)
+
+  class OrderByParameter
+    def initialize(value)
+      @value = value
+      @encoded_value = MagicNumbers::OrderBy[value.downcase]
+    end
+    
+    def to_param
       "matchOrderBy=#{@encoded_value}"
     end
   end
-  
-  # we fake this by paginating results ourselves.
-  # class MatchLimitFilter < Filter
-  #   def lookup(value)
-  #     'MATCH'
-  #   end
-  #   
-  #   def to_param(n)
-  #     nil
-  #   end
-  # end
-  
+
   class RequirePhotoFilter < Filter
     def lookup(value)
       value ? 1 : 0

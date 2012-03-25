@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe "pagination" do
   before(:each) do
-    VCR.use_cassette('paginate_search_results', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
-      @search = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD']).search({
+    VCR.use_cassette('paginate_search_results_by_10', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
+      okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
+      
+      @search = okc.search({
         gentation: 'girls who like guys'
       })
       @search.results

@@ -24,7 +24,7 @@ describe "Search" do
         :radius => 25, # acceptable values are 25, 50, 100, 250, 500
         :require_photo => false,
         :relationship_status => 'any'
-      }).url.should =='/match?matchOrderBy=MATCH&filter2=5,315360000&locid=0&filter4=3,25&filter5=1,0&filter6=35,0&filter7=0,20&filter8=2,33,34'
+      }).url.should =='/match?filter1=5,315360000&filter2=3,25&filter3=1,0&filter4=35,0&filter5=0,20&filter6=2,33,34&low=1&count=10&matchOrderBy=MATCH&locid=0&timekey=1&custom_search=0'
     end
   end
 end
@@ -60,7 +60,7 @@ describe "Filters" do
     end
     
     it "custom filters: order_by" do
-      OKCupid::OrderByFilter.new('order_by', 'Match %').to_param(1).should == 'matchOrderBy=MATCH'
+      OKCupid::OrderByParameter.new('Match %').to_param.should == 'matchOrderBy=MATCH'
     end
     
     it "custom filters: age" do
@@ -87,15 +87,15 @@ describe "Filters" do
     
     describe 'custom filters: location' do
       it "can use the 'near me' value" do
-        OKCupid::LocationFilter.new('location', 'Near me').to_param(1).should == 'locid=0'
+        OKCupid::LocationParameter.new('Near me').to_param.should == 'locid=0'
       end
       
       it 'can use a location query' do
-        OKCupid::LocationFilter.new('location', 'Cincinnati, Ohio').to_param(1).should == 'lquery=Cincinnati,%20Ohio'
+        OKCupid::LocationParameter.new('Cincinnati, Ohio').to_param.should == 'lquery=Cincinnati,%20Ohio'
       end
       
       it "can use a location_id" do
-        OKCupid::LocationFilter.new('location', 4335338).to_param(1).should == 'locid=4335338'
+        OKCupid::LocationParameter.new(4335338).to_param.should == 'locid=4335338'
       end
     end
   end

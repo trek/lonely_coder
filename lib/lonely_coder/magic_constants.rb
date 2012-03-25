@@ -66,7 +66,7 @@ class OKCupid
       # "v_looks" => 23,
       # "v_personality" => 25,
       
-      # added by us
+      # filters
       'match_limit' => 'match_limit',
       'order_by' => 'order_by',
       'location' => 'location'
