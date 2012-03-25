@@ -11,7 +11,7 @@ require 'mechanize'
 
 class OKCupid
   BaseUrl = 'http://www.okcupid.com'
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
   
   def initialize(username=nil, password=nil)
     @browser = Mechanize.new 
