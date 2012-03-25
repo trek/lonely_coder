@@ -254,7 +254,7 @@ class OKCupid
         if @value.downcase == 'near me'
           "locid=0"
         else
-          "lquery=#{URI.escape(@value)}"
+          "locid=#{Search.location_id_for(@value)}&lquery=#{URI.escape(@value)}"
         end
       else
         "locid=#{@value}"

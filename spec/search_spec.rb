@@ -6,6 +6,22 @@ describe "Search" do
     lambda { OKCupid::Search.new({}) }.should raise_error(OKCupid::Search::FilterError)
   end
   
+  it "with a location query looks up the location id" do
+    VCR.use_cassette('search_that_includes_a_location') do
+      OKCupid::Search.new({
+        :min_age => 33,
+        :max_age => 34,
+        :order_by => 'Match %',
+        :last_login => 'last decade',
+        :gentation => 'Guys who like guys',
+        :location => 'Boise, Idaho',
+        :radius => 25,
+        :require_photo => false,
+        :relationship_status => 'any'
+      }).url.should =='/match?filter1=5,315360000&filter2=3,25&filter3=1,0&filter4=35,0&filter5=0,20&filter6=2,33,34&low=1&count=10&matchOrderBy=MATCH&locid=4356487&lquery=Boise,%20Idaho&timekey=1&custom_search=0'
+    end
+  end
+  
   it "complains about malformed key values" do
     lambda { OKCupid::Search.new({
       :gentation => 'Cats who like laser beams',
@@ -20,8 +36,8 @@ describe "Search" do
         :order_by => 'Match %',
         :last_login => 'last decade',
         :gentation => 'Guys who like guys',
-        :location => 'near me', # can be 'near me', 'anywhere', a location name (e.g. 'Ann Arbor, MI'), or a location id
-        :radius => 25, # acceptable values are 25, 50, 100, 250, 500
+        :location => 'near me',
+        :radius => 25,
         :require_photo => false,
         :relationship_status => 'any'
       }).url.should =='/match?filter1=5,315360000&filter2=3,25&filter3=1,0&filter4=35,0&filter5=0,20&filter6=2,33,34&low=1&count=10&matchOrderBy=MATCH&locid=0&timekey=1&custom_search=0'
@@ -43,7 +59,7 @@ describe "Results" do
   end
 end
 
-describe "Filters" do
+describe "Options" do
   describe "lookup" do
     it "finds the encoded value" do
       OKCupid::Filter.new('relationship_status', 'single').lookup('single').should == 2
@@ -91,7 +107,9 @@ describe "Filters" do
       end
       
       it 'can use a location query' do
-        OKCupid::LocationParameter.new('Cincinnati, Ohio').to_param.should == 'lquery=Cincinnati,%20Ohio'
+        VCR.use_cassette('location_filter_looks_up_location_id') do
+          OKCupid::LocationParameter.new('Cincinnati, Ohio').to_param.should == 'locid=4164146&lquery=Cincinnati,%20Ohio'
+        end
       end
       
       it "can use a location_id" do

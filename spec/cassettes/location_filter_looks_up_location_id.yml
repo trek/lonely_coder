@@ -1,0 +1,45 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://www.okcupid.com/locquery?func=query&query=Cincinnati,%20Ohio
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 25 Mar 2012 04:56:31 GMT
+      Content-Type:
+      - text/javascript
+      Connection:
+      - close
+      Cache-Control:
+      - private
+      Server:
+      - OKWS/3.1.15.5
+      P3p:
+      - CP="NOI CURa ADMa DEVa TAIa OUR BUS IND UNI COM NAV INT", policyref="http://www.okcupid.com/w3c/p3p.xml"
+      Content-Length:
+      - '160'
+      Set-Cookie:
+      - guest=14433467885058850318; expires=Mon, 25 Mar 2013 04:56:31 GMT; path=/;
+        domain=okcupid.com
+    body:
+      encoding: US-ASCII
+      string: ! '{"status" : 0, "query" : "Cincinnati, Ohio", "results" : [{"locid"
+        : 4164146, "text" : "Cincinnati"}, {"locid" : 4344665, "text" : "Cincinnati"}],
+        "locid" : 0}
+
+'
+    http_version: 
+  recorded_at: Sun, 25 Mar 2012 04:56:31 GMT
+recorded_with: VCR 2.0.0
