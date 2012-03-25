@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Trek Glowacki"]
   s.email       = ["trek.glowacki@gmail.com"]
   s.homepage    = "http://github.com/trek/lonely_coder"
-  s.summary     = %q{}
-  s.description = %q{}
+  s.summary     = %q{A gem for interacting with OKCupid as if it had an API}
+  s.description = %q{A gem for interacting with OKCupid as if it had an API.}
 
   s.add_dependency 'mechanize', '= 2.0.1'
   s.add_dependency 'activesupport', '>= 3.2.1'
