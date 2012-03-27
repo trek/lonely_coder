@@ -95,5 +95,17 @@ class OKCupid
     def ==(other)
       self.username == other.username
     end
+    
+    def eql?(other)
+      self.username == other.username
+    end
+    
+    def hash
+      if self.username
+        self.username.hash
+      else
+        super
+      end
+    end
   end
 end

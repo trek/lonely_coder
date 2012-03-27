@@ -46,14 +46,25 @@ describe "Search" do
 end
 
 describe "Results" do
-  it "returns an array of OKCupid::Profile objects" do
+  it "returns an empty collection if nothing is found" do
+    VCR.use_cassette('search_finding_no_results', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
+      @results = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD']).search({
+        gentation: 'guys who like guys',
+        min_age: 25,
+        max_age: 25,
+        location: 4195656
+      }).results
+    end
+    @results.empty?.should == true
+  end
+  
+  it "returns an collection of OKCupid::Profile objects" do
     VCR.use_cassette('search_by_filters', :erb => {:username => ENV['OKC_USERNAME'], :password => ENV['OKC_PASSWORD']}) do
       @results = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD']).search({
         gentation: 'girls who like guys'
       }).results
     end
     
-    @results.should be_kind_of(Array)
     @results.size.should == 10
     @results.all? {|p| p.kind_of?(OKCupid::Profile)}.should == true
   end

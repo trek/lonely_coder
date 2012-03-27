@@ -32,12 +32,12 @@ class OKCupid
       
       options.each do |name,value|
         self.send("add_#{name}_option", value)
-        # if OKCupid.const_defined?("#{name.to_s.camelize}Filter")
-        #   @filters << OKCupid.const_get("#{name.to_s.camelize}Filter").new(name, value)
-        # else
-        #   @filters << Filter.new(name, value)
-        # end
       end
+      
+      # OKC needs an initial time key of 1 to represent "waaaay in the past"
+      # futures searches will use the OKC server value returned from the first
+      # results set
+      @timekey = 1
     end
     
     def add_order_by_option(value)
@@ -121,15 +121,18 @@ class OKCupid
     def results
       return @results if @results
       
-      @browser.pluggable_parser.html = SearchPaginationParser
-      page = @browser.get(ajax_url)
+      # the first results request has to receive a full HTML page.
+      # subseqent calls can make json requests
+      page = @browser.get(url)
+      @timekey = page.search('script')[0].text.match(/CurrentGMT = new Date\(([\d]+)\*[\d]+\)/).captures[0]
       
-      @results = page.search('.match_row').collect do |node|
+      # OKCupid will return previous profiles if there aren't enough
+      # profiles to fill a query, so we stop that with a set.
+      @results = Set.new
+      @results += page.search('.match_row').collect do |node|
         OKCupid::Profile.from_search_result(node)
       end
-      
-      @browser.pluggable_parser.html = Mechanize::Page
-      
+            
       @results
     end
     
@@ -142,16 +145,29 @@ class OKCupid
     # mygender=m
     # no idea what the following parameters do, but without them, the search
     # behaves erratically
-    # &timekey=1
     # &custom_search=0
+    # 
+    # OKCupid timestamps searches for pagniation. The first search gets a timestamp
+    # of 1 (e.g. 1 second into the epoch) and future searches are stamped with
+    # some server cache value. If that server value isn't submitted, the results
+    # for pagniation don't quite match what you'd expect: you'll get duplicates, 
+    # or lower numbers than expected.
+    # &timekey=1
+    
     def magic_params_not_truly_understood
-      "timekey=1&custom_search=0"
+      "timekey=#{@timekey}&custom_search=0"
     end
     
+    # returns true if it worked, false if not.
+    # OKCupid searches will return duplicate results if you attempt to
+    # page beyond the availble results.
     def load_next_page
       @browser.pluggable_parser.html = SearchPaginationParser
       
-      page = @browser.get("#{ajax_url}&#{@pagination.next.to_param}")
+      @pagination.next
+      previous_length = @results.size
+      
+      page = @browser.get(ajax_url)
       
       @results += page.search('.match_row').collect do |node|
         OKCupid::Profile.from_search_result(node)
@@ -159,7 +175,7 @@ class OKCupid
       
       @browser.pluggable_parser.html = Mechanize::Page
       
-      self
+      previous_length != @results.size
     end
     
     def url
