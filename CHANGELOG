@@ -1,0 +1,3 @@
+0.1.4 (March 27, 2012)
+* more consistent search results when paginating by using OKCupid server timestamps
+* Search#load_next_page returns boolean to deal with cases where pagination doesn't load new results
