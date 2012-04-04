@@ -2,15 +2,43 @@ require 'uri'
 require 'set'
 
 class OKCupid
+  # Creates a new Search with the passed options to act as query parameters.
+  # A search will not trigger a query to OKCupid until `results` is called.
+  #
+  # @param [Hash] options a list of options for the search
+  # @option options [Integer] :min_age (18) Minimum age to search for
+  # @option options [Integer] :max_age (99) Maximum age to search for
+  # @option options [String]  :order_by ('match %') The sort order of the search results.
+  #                           Acceptable values are 'match %','friend %', 'enemy %', 
+  #                           'special blend', 'join', and 'last login'.
+  #
+  # @option options [Integer] :radius (25) The search radius, in miles.
+  #                           Acceptable values are 25, 50, 100, 250, 500.
+  #                           You must also specific a :location option.
+  # @option options [Integer, String] :location ('near me'). A specific search location.
+  #                                   Acceptable values are 'near me', 'anywhere', a "City, State" pair
+  #                                   (e.g. 'Chicago, Illinois') or OKCupid location id which can be
+  #                                   obtained with Search#location_id_for("City, State").
+  #                                   If specifiying a location other than 'near me' or 'anywhere'
+  #                                   you may also provide a :radius option
+  # 
+  # @option options [true, false] :require_photo (true). Search for profiles that have photos
+  # @option options [String] :relationship_status ('single'). Acceptable values are 'single', 'not single', 'any'
+  # @return [Search] A Searhc without results loaded. To trigger a query against OKCupid call `results`
   def search(options={})
     Search.new(options, @browser)
   end
   
+  # The OKCupid search object. Stores filters and query options and a results set.  Correct useage is to obtain
+  # and instance of this class by using OKCupid#search(options).
+  # @see OKCupid#search
   class Search
     class FilterError < StandardError; end
     
     attr_reader :filters
     
+    # @param [String] A string query for a city and state pair, e.g. 'Little Rock, Arkansas'
+    # @return [Integer] The OKCupid location id for the query
     def self.location_id_for(query)
       uri = URI("http://www.okcupid.com/locquery?func=query&query=#{URI.encode(query)}")
       JSON.parse(Net::HTTP.get(uri))['results'][0]['locid'].to_s
@@ -25,11 +53,18 @@ class OKCupid
     def parse(options)
       check_for_required_options(options)
       
+      # :age appears as two options when creating a search
+      # but is combined into one for paramterizing.
       options[:age] = combine_ages(options)
       
-      
+      # filters appear in the query string as filterN=code,value
+      # e.g. filter4=11,75
       @filters = []
+      
+      # parameters appear in the query string as named query parameters
+      # e.g. loc_id=1234567
       @parameters = []
+      
       
       options.each do |name,value|
         self.send("add_#{name}_option", value)
@@ -37,7 +72,7 @@ class OKCupid
       
       # OKC needs an initial time key of 1 to represent "waaaay in the past"
       # futures searches will use the OKC server value returned from the first
-      # results set
+      # results set.
       @timekey = 1
     end
     
@@ -86,17 +121,7 @@ class OKCupid
       options[:age] = age
     end
     
-    # Default values for search:
-    # match_limit 80
-    # min_age 18
-    # max_age 99
-    # order_by 'match %'
-    # last_login 'last month'
-    # location 'Near me'
-    #    to search 'anywhere', use 'Near me' and omit a radius
-    # radius 25
-    # require_photo true
-    # relationship_status 'single'
+    #
     def defaults
       {
         :pagination => {
@@ -108,7 +133,7 @@ class OKCupid
         :order_by => 'Match %',
         :last_login => 'last month',
         :location => 'Near me',
-        :radius => 25, # acceptable values are 25, 50, 100, 250, 500, nil
+        :radius => 25,
         :require_photo => true,
         :relationship_status => 'single'
       }
@@ -120,10 +145,13 @@ class OKCupid
       # the first results request has to receive a full HTML page.
       # subseqent calls can make json requests
       page = @browser.get(url)
+      
+      # Stores the OKCupid server timestamp. Without this, pagination returns
+      # inconsistent results.
       @timekey = page.search('script')[0].text.match(/CurrentGMT = new Date\(([\d]+)\*[\d]+\)/).captures[0]
       
-      # OKCupid will return previous profiles if there aren't enough
-      # profiles to fill a query, so we stop that with a set.
+      # OKCupid may return previously found profiles if there aren't enough
+      # to fill a query or pagination, so we stop that with a set.
       @results = Set.new
       @results += page.search('.match_row').collect do |node|
         OKCupid::Profile.from_search_result(node)
@@ -139,24 +167,25 @@ class OKCupid
     # update_prefs=1
     # using_saved_search=0
     # mygender=m
+    # 
     # no idea what the following parameters do, but without them, the search
     # behaves erratically
     # &custom_search=0
     # 
-    # OKCupid timestamps searches for pagniation. The first search gets a timestamp
+    # OKCupid timestamps searches for pagination. The first search gets a timestamp
     # of 1 (e.g. 1 second into the epoch) and future searches are stamped with
     # some server cache value. If that server value isn't submitted, the results
     # for pagniation don't quite match what you'd expect: you'll get duplicates, 
     # or lower numbers than expected.
     # &timekey=1
-    
     def magic_params_not_truly_understood
       "timekey=#{@timekey}&custom_search=0"
     end
     
-    # returns true if it worked, false if not.
-    # OKCupid searches will return duplicate results if you attempt to
-    # page beyond the availble results.
+    
+    # Loads the next page of possible results. Will return `true` if 
+    # additional results were available or `false` if not
+    # @return [true,false]
     def load_next_page
       @browser.pluggable_parser.html = SearchPaginationParser
       
@@ -261,7 +290,6 @@ class OKCupid
     end
     
     def to_param
-      # to do: 'anywhere' needs to remove the radius filter
       if @value.is_a?(String)
         if @value.downcase == 'near me'
           "locid=0"
