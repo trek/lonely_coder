@@ -20,8 +20,7 @@ Lonely coder seeks nice boy
         :min_age => 25,
         :max_age => 35, # just someone around my age, yo
         :gentation => 'Guys who like guys', # don't hate
-        :order_by => 'Match %', # I want us to get along
-        :match_limit => 80, # let's make it last
+        :order_by => 'Match %', # I want us to get along, let's make it last
         :last_login => 'last month',
         :location => maybe_here
         :radius => 25, # acceptable values are 25, 50, 100, 250, 500, nil
