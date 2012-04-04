@@ -1,13 +1,34 @@
 require 'uri'
 require 'set'
 
+require 'lonely_coder/search/magic_constants'
+require 'lonely_coder/search/search_pagination_parser'
+require 'lonely_coder/search/options/filter'
+
+# these are the included filters. See Filter class documentation for adding your own.
+require 'lonely_coder/search/options/age'
+require 'lonely_coder/search/options/ethnicity'
+require 'lonely_coder/search/options/order_by'
+require 'lonely_coder/search/options/location'
+require 'lonely_coder/search/options/paginator'
+require 'lonely_coder/search/options/radius'
+require 'lonely_coder/search/options/require_photo'
+
 class OKCupid
   # Creates a new Search with the passed options to act as query parameters.
   # A search will not trigger a query to OKCupid until `results` is called.
   #
   # @param [Hash] options a list of options for the search
-  # @option options [Integer] :min_age (18) Minimum age to search for
-  # @option options [Integer] :max_age (99) Maximum age to search for
+  # @option options [Integer] :min_age (18) Minimum age to search for.
+  # @option options [Integer] :max_age (99) Maximum age to search for.
+  # @option options [String]  :gentation Gentation is OKCupid's portmanteau for 'gender and orientation'.
+  #                           Acceptable values are:
+  #                           "girls who like guys", "guys who like girls", "girls who like girls", 
+  #                           "guys who like guys", "both who like bi guys", "both who like bi girls",
+  #                           "straight girls only", "straight guys only", "gay girls only", 
+  #                           "gay guys only", "bi girls only", "bi guys only", "everybody"
+  #                           this option is required.
+  # 
   # @option options [String]  :order_by ('match %') The sort order of the search results.
   #                           Acceptable values are 'match %','friend %', 'enemy %', 
   #                           'special blend', 'join', and 'last login'.
@@ -24,7 +45,7 @@ class OKCupid
   # 
   # @option options [true, false] :require_photo (true). Search for profiles that have photos
   # @option options [String] :relationship_status ('single'). Acceptable values are 'single', 'not single', 'any'
-  # @return [Search] A Searhc without results loaded. To trigger a query against OKCupid call `results`
+  # @return [Search] A Search without results loaded. To trigger a query against OKCupid call `results`
   def search(options={})
     Search.new(options, @browser)
   end
@@ -74,42 +95,6 @@ class OKCupid
       # futures searches will use the OKC server value returned from the first
       # results set.
       @timekey = 1
-    end
-    
-    def add_order_by_option(value)
-      @parameters << OrderByParameter.new(value)
-    end
-    
-    def add_last_login_option(value)
-      @filters << Filter.new('last_login', value)
-    end
-    
-    def add_location_option(value)
-      @parameters << LocationParameter.new(value)
-    end
-    
-    def add_radius_option(value)
-      @filters << RadiusFilter.new('radius', value)
-    end
-    
-    def add_require_photo_option(value)
-      @filters << RequirePhotoFilter.new('require_photo', value)
-    end
-    
-    def add_relationship_status_option(value)
-      @filters << Filter.new('relationship_status', value)
-    end
-    
-    def add_gentation_option(value)
-      @filters << Filter.new('gentation', value)
-    end
-    
-    def add_age_option(value)
-      @filters << AgeFilter.new('age', value)
-    end
-    
-    def add_pagination_option(value)
-      @parameters << @pagination = Paginator.new(value)
     end
     
     def check_for_required_options(options)
@@ -217,122 +202,6 @@ class OKCupid
     
     def filters_as_query
       filters.compact.to_enum(:each_with_index).map {|filter,index| filter.to_param(index+1)}.join('&')
-    end
-  end
-  
-  # used to create the pagination part of a search url:
-  # low=1&count=10&ajax_load=1
-  # where low is the start value
-  # count is the number of items per page
-  class Paginator
-    attr_reader :page, :per_page
-    
-    def initialize(options)
-      @per_page = options[:per_page]
-      @page = options[:page]
-    end
-    
-    def low
-      @low = ((@page - 1) * @per_page) + 1
-    end
-    
-    def next
-      @page +=1
-      self
-    end
-    
-    def to_param
-      "low=#{low}&count=#{@per_page}"
-    end
-  end
-  
-  class Filter
-    class NoSuchFilter < StandardError; end
-    class BadValue     < StandardError; end
-    
-    attr_reader :name, :value, :code
-    
-    def initialize(name, value)
-      @code = MagicNumbers::Filters[name.to_s]
-      raise(NoSuchFilter, name) unless @code
-      
-      @name = name.to_s
-      @value = value
-      @encoded_value = lookup(@value)
-      unless @encoded_value
-        raise(BadValue, "#{@value.inspect} is not a possible value for #{@name}. Try one of #{allowed_values.map(&:inspect).join(', ')}")
-      end
-    end
-    
-    def allowed_values
-      MagicNumbers.const_get(@name.camelize).keys
-    end
-    
-    def lookup(value)
-      MagicNumbers.const_get(@name.camelize)[value.downcase]
-    end
-    
-    def to_param(n)
-      "filter#{n}=#{@code},#{@encoded_value}"
-    end
-  end
-  
-  class EthnicityFilter < Filter
-    def lookup(values)
-      # lookup the race values and sum them. I think OKC is doing some kind of base2 math on them
-      values.collect {|v| MagicNumbers::Ethnicity[v.downcase]}.inject(0, :+)
-    end
-  end
-  
-  class LocationParameter
-    def initialize(value)
-      @value = value
-    end
-    
-    def to_param
-      if @value.is_a?(String)
-        if @value.downcase == 'near me'
-          "locid=0"
-        else
-          "locid=#{Search.location_id_for(@value)}&lquery=#{URI.escape(@value)}"
-        end
-      else
-        "locid=#{@value}"
-      end
-    end
-  end
-
-  class OrderByParameter
-    def initialize(value)
-      @value = value
-      @encoded_value = MagicNumbers::OrderBy[value.downcase]
-    end
-    
-    def to_param
-      "matchOrderBy=#{@encoded_value}"
-    end
-  end
-
-  class RequirePhotoFilter < Filter
-    def lookup(value)
-      value ? 1 : 0
-    end
-  end
-    
-  class RadiusFilter < Filter
-    def lookup(value)
-      value.nil? ? '' : value
-    end
-    
-    def to_param(n)
-      return nil if @encoded_value === ''
-      super
-    end
-  end
-  
-  class AgeFilter < Filter
-    def lookup(value)
-      "#{value[0]},#{value[1]}"
     end
   end
 end

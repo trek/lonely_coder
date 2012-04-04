@@ -31,9 +31,7 @@ end
 
 require 'active_support/core_ext/string/inflections'
 
-require 'lonely_coder/magic_constants'
 require 'lonely_coder/profile'
 require 'lonely_coder/search'
-require 'lonely_coder/search_pagination_parser'
 require 'lonely_coder/authentication'
 require 'lonely_coder/mailbox'
