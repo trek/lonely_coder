@@ -7,8 +7,8 @@ class OKCupid
   end
   
   class Search
-    def add_ethnicity_option(value)
-      # implement
+    def add_ethnicity_option(values)
+      @filters << EthnicityFilter.new('ethnicity', values)
     end
   end
 end
