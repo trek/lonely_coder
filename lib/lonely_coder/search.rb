@@ -1,4 +1,5 @@
 require 'uri'
+require 'set'
 
 class OKCupid
   def search(options={})
@@ -76,10 +77,6 @@ class OKCupid
       @parameters << @pagination = Paginator.new(value)
     end
     
-    def add_match_limit_option(value)
-      # TODO.
-    end
-    
     def check_for_required_options(options)
       raise(FilterError, 'gentation is a required option') unless options.has_key?(:gentation)
     end
@@ -106,7 +103,6 @@ class OKCupid
           :page => 1,
           :per_page => 10
         },
-        :match_limit => 80,
         :min_age => 18,
         :max_age => 99,
         :order_by => 'Match %',
