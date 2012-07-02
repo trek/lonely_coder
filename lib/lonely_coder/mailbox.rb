@@ -50,6 +50,7 @@ class OKCupid
           css_class = message_html.attribute('class')
           css_id    = message_html.attribute('id')
           
+          # matches 'from_me' and 'to_me' classes.
           if (css_class && css_class.text.match(/_me/))
             if(css_id && css_id.text == 'compose')
               next

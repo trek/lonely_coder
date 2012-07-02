@@ -42,7 +42,7 @@ describe "Conversation" do
   end
   
   it "contains a list of messages" do
-    @conversation.messages.count.should == 8
+    @conversation.messages.count.should == 12
   end
   
   describe "each message" do
@@ -51,11 +51,11 @@ describe "Conversation" do
     end
     
     it "has a to_me" do
-      @message.to_me.should == true
+      @message.to_me.should == false
     end
     
     it "has a from_me" do
-      @message.from_me.should == false
+      @message.from_me.should == true
     end
   end
 end
