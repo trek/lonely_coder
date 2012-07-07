@@ -1,8 +1,8 @@
 require 'date'
 
 class OKCupid
-  def mailbox
-    @mailbox ||= Mailbox.new(@browser)
+  def inbox
+    @inbox ||= Mailbox.new(@browser)
   end
   
   def conversation_for(id)
