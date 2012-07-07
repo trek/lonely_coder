@@ -103,7 +103,7 @@ class OKCupid
       @browser = browser
     end
     
-    def useage
+    def usage
       html = @browser.get('/messages')
       current, max = html.search('p.fullness').text.match(/([\d]+) of ([\d]+)/).captures
       

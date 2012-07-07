@@ -50,7 +50,7 @@ class OKCupid
     Search.new(options, @browser)
   end
   
-  # The OKCupid search object. Stores filters and query options and a results set.  Correct useage is to obtain
+  # The OKCupid search object. Stores filters and query options and a results set.  Correct usage is to obtain
   # and instance of this class by using OKCupid#search(options).
   # @see OKCupid#search
   class Search
