@@ -1,8 +1,16 @@
 require 'date'
 
 class OKCupid
+
+  INBOX_URL = "/messages"
+  OUTBOX_URL = "/messages?folder=2"
+
   def inbox
-    @inbox ||= Mailbox.new(@browser)
+    @inbox ||= Mailbox.new(INBOX_URL, @browser)
+  end
+
+  def outbox
+    @outbox ||= Mailbox.new(OUTBOX_URL, @browser)
   end
   
   def conversation_for(id)
@@ -99,12 +107,15 @@ class OKCupid
       end
     end
     
-    def initialize(browser)
+    attr_reader :url
+
+    def initialize(url, browser)
       @browser = browser
+      @url = url
     end
     
     def useage
-      html = @browser.get('/messages')
+      html = @browser.get(@url)
       current, max = html.search('p.fullness').text.match(/([\d]+) of ([\d]+)/).captures
       
       return { current: current.to_i, max: max.to_i }
@@ -113,7 +124,7 @@ class OKCupid
     def messages
       @messages = []
       
-      html = @browser.get('/messages')
+      html = @browser.get(@url)
       messages_html = html.search('#messages li')
       @messages += messages_html.collect do |message|
         MessageSnippet.from_html(message)
