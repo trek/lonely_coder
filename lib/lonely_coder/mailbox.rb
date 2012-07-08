@@ -12,20 +12,20 @@ class OKCupid
   class Mailbox
     class MessageSnippet
       
-      attr_accessor :profile_username, :profile_small_avatar_url, :preview, :last_date, :conversation_url
+      attr_accessor :profile_username, :profile_small_avatar_url, :preview, :last_date, :conversation_id
       
       def self.from_html(html)
         profile_username = html.search('a.subject').text
         preview = html.search('.previewline').text
         last_date = html.search('.timestamp').text
-        conversation_url = html.search('p:first').attribute('onclick').text.gsub('window.location=\'', '').gsub('\';','')
+        conversation_id = html.attribute('id').text[/\d+/]
         profile_small_avatar_url = html.search('a.photo img').attribute('src').text
         
         self.new({
           profile_username: profile_username,
           preview: preview,
           last_date: Date.parse(last_date),
-          conversation_url: conversation_url,
+          conversation_id: conversation_id,
           profile_small_avatar_url: profile_small_avatar_url
         })
       end
