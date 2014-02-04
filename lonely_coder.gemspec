@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name        = "lonely_coder"
-  s.version     = '0.1.5'
+  s.version     = '0.1.5.1'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Trek Glowacki"]
   s.email       = ["trek.glowacki@gmail.com"]
@@ -13,18 +13,18 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport', '>= 3.2.1'
 
   s.post_install_message = %q{
-    
-    
-    
+
+
+
     ,d88b.d88b,
     88888888888
     `Y8888888Y'
       `Y888Y'
         `Y'
-    
+
         Good luck out there.
-    
-    
+
+
   }
 
   s.files         = `git ls-files`.split("\n")
