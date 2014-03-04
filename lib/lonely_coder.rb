@@ -13,7 +13,7 @@ require 'dimensions'
 
 class OKCupid
   BaseUrl = 'http://www.okcupid.com'
-  VERSION = '0.1.5'
+  VERSION = '0.2.0'
   
   def initialize(username=nil, password=nil)
     @browser = Mechanize.new 
