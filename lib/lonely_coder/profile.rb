@@ -6,8 +6,8 @@ class OKCupid
     Profile.by_username(username, @browser)
   end
 
-  def visitors_for(username)
-    Profile.get_new_visitors(username, @browser)
+  def visitors_for(username, previous_timestamp = nil)
+    Profile.get_new_visitors(username, previous_timestamp, @browser)
   end
 
   def likes_for(username)
@@ -71,11 +71,11 @@ class OKCupid
       return likes
     end
 
-    def Profile.get_new_visitors(username, browser)
+    def Profile.get_new_visitors(username, previous_timestamp = 1393545600, browser)
       html = browser.get("http://www.okcupid.com/visitors")
       visitors = html.search(".user_list .extra_info .last_visited script")
       new_visitors = 0
-      previous_timestamp = 1393545600 # todo: get the date when last scraped
+      # previous_timestamp = 1393545600 # todo: get the date when last scraped
 
       visitors.each { |visitor|
           new_visitor = visitor.text
