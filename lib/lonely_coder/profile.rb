@@ -138,8 +138,6 @@ class OKCupid
 
       profile = browser.get('http://www.okcupid.com/profile')
 
-      binding.pry
-
       authcode = profile.body.match(/authcode['"]?\s*:\s*['"]([\w,;]+?)['"]/)[1]
       userid = profile.body.match(/userid['"]?\s*:\s*['"]?(\d+)['"]?/)[1]
 
