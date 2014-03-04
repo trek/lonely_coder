@@ -14,6 +14,9 @@ class OKCupid
     Profile.get_new_likes(username, @browser)
   end
 
+  def update_section(section, text)
+    Profile.update_profile_section(section, text, @browser)
+  end
 
   def upload_pic(file, caption)
     Profile.upload_picture(file, caption, @browser)
@@ -130,6 +133,24 @@ class OKCupid
       end
 
       self.new(attributes)
+    end
+
+    def Profile.update_profile_section(section, text, browser)
+      section_titles = [
+        "My self-summary"
+      ]
+
+      profile = browser.get('http://www.okcupid.com/profile')
+
+      authcode = profile.body.match(/authcode['"]?\s*:\s*['"]([\w,;]+?)['"]/)[1]
+
+      section_response = browser.post('http://www.okcupid.com/profileedit2', {
+        :authcode => authcode,
+        :essay_body => text,
+        :essay_id => section,
+        :change_summary => "[title:start]#{section_titles[section]}[title:end][add:start]#{text}[add:end]",
+        :okc_api => 1
+      })
     end
 
     def Profile.upload_picture(file, caption, browser)
