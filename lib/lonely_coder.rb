@@ -8,6 +8,8 @@
 #               `Y'       - trek
 #
 require 'mechanize'
+require 'addressable/uri'
+require 'dimensions'
 
 class OKCupid
   BaseUrl = 'http://www.okcupid.com'

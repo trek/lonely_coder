@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 class OKCupid
 
   def profile_for(username)
@@ -13,6 +14,11 @@ class OKCupid
     Profile.get_new_likes(username, @browser)
   end
 
+
+  def upload_pic(file, caption)
+    Profile.upload_picture(file, caption, @browser)
+  end
+  
   class Profile
     attr_accessor :username, :match, :friend, :enemy, :location,
                   :age, :sex, :orientation, :single, :small_avatar_url
@@ -126,6 +132,48 @@ class OKCupid
       self.new(attributes)
     end
 
+    def Profile.upload_picture(file, caption, browser)
+
+      file_dimensions = Dimensions.dimensions(file)
+
+      profile = browser.get('http://www.okcupid.com/profile')
+
+      binding.pry
+
+      authcode = profile.body.match(/authcode['"]?\s*:\s*['"]([\w,;]+?)['"]/)[1]
+      userid = profile.body.match(/userid['"]?\s*:\s*['"]?(\d+)['"]?/)[1]
+
+      upload_response = browser.post('http://www.okcupid.com/ajaxuploader', {
+        'file' => File.new(file)
+      })
+
+      picid = upload_response.body.match(/id'\s*:\s*'(\d+)/)[1]
+
+      uri = Addressable::URI.parse('http://www.okcupid.com/photoupload')
+      uri.query_values = {
+        :authcode => authcode,
+        :userid => userid,
+        :picid => picid,
+        :width => file_dimensions[0],
+        :height => file_dimensions[1],
+        :tn_upper_left_x => 0,
+        :tn_upper_left_y => 0,
+        :tn_lower_right_x => file_dimensions[0],
+        :tn_lower_right_y => file_dimensions[1],
+
+        :caption => caption,
+        :albumid => 0,
+        :use_new_upload => 1,
+        :okc_api => 1,
+        :'picture.add_ajax' => 1,
+      }
+      
+      uri.to_s
+
+      create_photo = browser.get(uri.to_s)
+
+    end
+    
     def initialize(attributes)
       attributes.each do |attr,val|
         self.send("#{attr}=", val)
@@ -149,3 +197,4 @@ class OKCupid
     end
   end
 end
+
