@@ -29,7 +29,7 @@ class OKCupid
     # extended profile details
     attr_accessor :last_online, :ethnicity, :height, :body_type, :diet, :smokes,
                   :drinks, :drugs, :religion, :sign, :education, :job, :income,
-                  :offspring, :pets, :speaks, :profile_thumb_urls
+                  :offspring, :pets, :speaks, :profile_thumb_urls, :essays
 
 
     # Scraping is never pretty.
@@ -109,6 +109,11 @@ class OKCupid
 
       profile_thumb_urls = html.search('#profile_thumbs img').collect {|img| img.attribute('src').value}
 
+      essays = []
+      10.times do |i|
+        essays[i] = html.search('#essay_text_' + i.to_s).text.strip!
+      end
+
       attributes = {
         username: username,
         match: match,
@@ -119,7 +124,8 @@ class OKCupid
         orientation: orientation,
         location: location,
         single: single,
-        profile_thumb_urls: profile_thumb_urls
+        profile_thumb_urls: profile_thumb_urls,
+        essays: essays
       }
 
       details_div = html.search('#profile_details dl')
