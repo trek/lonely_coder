@@ -143,9 +143,34 @@ class OKCupid
 
     def Profile.update_profile_section(section, text, browser)
       section_titles = [
-        "My self-summary"
+        "My self-summary",
+        "What I’m doing with my life",
+        "I’m really good at",
+        "The first things people usually notice about me",
+        "Favorite books, movies, shows, music, and food",
+        "The six things I could never do without",
+        "I spend a lot of time thinking about",
+        "On a typical Friday night I am",
+        "The most private thing I’m willing to admit",
+        "You should message me if"
       ]
 
+      section_titles_hash = {
+        :self_summary => 0,
+        :im_doing => 1,
+        :good_at => 2,
+        :first_thing => 3,
+        :favorites => 4,
+        :six_things => 5,
+        :think_about => 6,
+        :private => 7,
+        :message_me => 8
+      }
+
+      if section.class == Symbol
+        section = section_titles_hash[section]
+      end
+      
       profile = browser.get('http://www.okcupid.com/profile')
 
       authcode = profile.body.match(/authcode['"]?\s*:\s*['"]([\w,;]+?)['"]/)[1]
