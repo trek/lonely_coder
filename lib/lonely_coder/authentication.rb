@@ -6,6 +6,10 @@ class OKCupid
     @authentication = Authentication.new(username, password, @browser)
   end
 
+  def authenticated?
+    @authentication.success?
+  end
+  
   class Authentication
     def initialize(username, password, browser)
       change_to_using_simpler_parser(browser)
