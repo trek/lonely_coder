@@ -6,7 +6,7 @@ class OKCupid
     Profile.by_username(username, @browser)
   end
 
-  def visitors_for(username, previous_timestamp = nil)
+  def visitors_for(username, previous_timestamp = 0)
     Profile.get_new_visitors(username, previous_timestamp, @browser)
   end
 
@@ -71,17 +71,21 @@ class OKCupid
 
     def Profile.get_new_visitors(username, previous_timestamp = 1393545600, browser)
       html = browser.get("http://www.okcupid.com/visitors")
-      visitors = html.search(".user_list .extra_info .last_visited script")
+      visitors = html.search(".user_list .user_row_item")
+
       new_visitors = 0
       # previous_timestamp = 1393545600
 
       visitors.each { |visitor|
-          new_visitor = visitor.text
-          index = new_visitor.index(', ')
-          date = new_visitor[index + 2, index + 10]
-          index = date.index(', ')
-          date = date[0, index].to_i
-          if (date > previous_timestamp)
+          begin
+            timestamp_script = visitor.search(".timestamp script")
+            timestamp_search = timestamp_script.text.match(/FancyDate\.add\([^,]+?,\s*(\d+)\s*,/)
+            timestamp = timestamp_search[1]
+            timestamp = timestamp.to_i
+          rescue
+            next
+          end
+          if (timestamp > previous_timestamp)
             new_visitors += 1
           end
       }
