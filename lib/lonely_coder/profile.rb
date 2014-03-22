@@ -66,8 +66,6 @@ class OKCupid
       index = text.index(' people')
       likes = text[0, index].to_i
 
-      # todo: get the old likes (do old likes - likes and return new likes)
-
       return likes
     end
 
@@ -75,7 +73,7 @@ class OKCupid
       html = browser.get("http://www.okcupid.com/visitors")
       visitors = html.search(".user_list .extra_info .last_visited script")
       new_visitors = 0
-      # previous_timestamp = 1393545600 # todo: get the date when last scraped
+      # previous_timestamp = 1393545600
 
       visitors.each { |visitor|
           new_visitor = visitor.text
@@ -88,7 +86,6 @@ class OKCupid
           end
       }
 
-      # todo: set the date when last scraped + save number of visitors
       return new_visitors
     end
 
