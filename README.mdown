@@ -22,7 +22,7 @@ Lonely coder seeks nice boy
         :gentation => 'Guys who like guys', # don't hate
         :order_by => 'Match %', # I want us to get along, let's make it last
         :last_login => 'last month',
-        :location => maybe_here
+        :location => maybe_here,
         :radius => 25, # acceptable values are 25, 50, 100, 250, 500, nil
         :require_photo => true, # I like a goofy smile
         :relationship_status => 'single' # the heart aches, but not for friends
