@@ -81,8 +81,8 @@ describe "MessageSnippet" do
     @header.preview.should == 'No, I was there like a month ago. I live in EL so  ...'
   end
   
-  it "has a conversation_url" do
-    @header.conversation_url.should == '/messages?readmsg=true&threadid=9950201897626358080&folder=1'
+  it "has a conversation_id" do
+    @header.conversation_id.should == '9950201897626358080'
   end
   
   it "has a last_date" do
