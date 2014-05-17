@@ -5,7 +5,7 @@ describe "Mailbox" do
     VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
       okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
       @mailbox = okc.mailbox
-      @mailbox.useage.should == {
+      @mailbox.usage.should == {
         current: 233,
         max: 300
       }
