@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name        = "lonely_coder"
-  s.version     = '0.1.5.1'
+  s.version     = '0.2.0.0'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Trek Glowacki"]
   s.email       = ["trek.glowacki@gmail.com"]
@@ -10,6 +10,8 @@ Gem::Specification.new do |s|
   s.description = %q{A gem for interacting with OKCupid as if it had an API.}
 
   s.add_dependency 'mechanize', '= 2.0.1'
+  s.add_dependency 'addressable', '= 2.3.5'
+  s.add_dependency 'dimensions', '= 1.3.0'
   s.add_dependency 'activesupport', '>= 3.2.1'
 
   s.post_install_message = %q{
