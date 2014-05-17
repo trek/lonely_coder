@@ -4,8 +4,8 @@ describe "Mailbox" do
   it "tells you how full your mailbox is" do
     VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
       okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
-      @mailbox = okc.mailbox
-      @mailbox.useage.should == {
+      @inbox = okc.inbox
+      @inbox.useage.should == {
         current: 233,
         max: 300
       }
@@ -15,18 +15,73 @@ describe "Mailbox" do
   it "can access the first message, up to 30" do
     VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
       okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
-      @mailbox = okc.mailbox
-      @mailbox.messages.count.should == 30
+      @inbox = okc.inbox
+      @inbox.messages.count.should == 30
     end
   end
   
   it "each message header is a header" do
     VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
       okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
-      @mailbox = okc.mailbox
-      @mailbox.messages.all? {|m| m.is_a?(OKCupid::Mailbox::MessageSnippet)}.should == true
+      @inbox = okc.inbox
+      @inbox.messages.all? {|m| m.is_a?(OKCupid::Mailbox::MessageSnippet)}.should == true
     end
   end
+
+  describe "inbox object" do
+
+    before(:each) do
+      VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
+        @okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
+        @inbox = @okc.inbox
+      end
+    end
+
+    it "uses the inbox url" do
+      @inbox.url.should == OKCupid::INBOX_URL
+    end
+
+    it "is cached" do
+      new_inbox = @okc.inbox
+      @inbox.object_id.should == new_inbox.object_id
+    end
+
+    it "includes unsolicited messages" do
+      pending "cassettes are re-recorded"
+      VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
+        @outbox.messages.map(&:profile_username).should include("incoming_username")
+      end
+    end
+
+  end
+
+  describe "outbox object" do
+
+    before(:each) do
+      VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
+        @okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
+        @outbox = @okc.outbox
+      end
+    end
+
+    it "uses the outbox url" do
+      @outbox.url.should == OKCupid::OUTBOX_URL
+    end
+
+    it "is cached" do
+      new_outbox = @okc.outbox
+      @outbox.object_id.should == new_outbox.object_id
+    end
+
+    it "includes messages with no response" do
+      pending "cassettes are re-recorded"
+      VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
+        @outbox.messages.map(&:profile_username).should include("outgoing_username")
+      end
+    end
+
+  end
+
 end
 
 describe "Conversation" do
@@ -64,8 +119,8 @@ describe "MessageSnippet" do
   before(:each) do
     VCR.use_cassette('loading_mailbox', :erb => {username: ENV['OKC_USERNAME'], password: ENV['OKC_PASSWORD']}) do
       okc = OKCupid.new(ENV['OKC_USERNAME'], ENV['OKC_PASSWORD'])
-      mailbox = okc.mailbox
-      @header = mailbox.messages.first
+      inbox = okc.inbox
+      @header = inbox.messages.first
     end
   end
   
