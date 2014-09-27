@@ -3,7 +3,7 @@ class OKCupid
     def initialize(value)
       @value = value
     end
-    
+
     def to_param
       if @value.is_a?(String)
         if @value.downcase == 'near me'
@@ -16,7 +16,7 @@ class OKCupid
       end
     end
   end
-  
+
   class Search
     def add_location_option(value)
       @parameters << LocationParameter.new(value)

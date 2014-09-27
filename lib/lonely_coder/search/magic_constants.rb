@@ -13,7 +13,7 @@ class OKCupid
       "white" => 256,
       "human" => 512
     }
-    
+
     Gentation = {
       "girls who like guys" => 34,
       "guys who like girls" => 17,
@@ -29,7 +29,7 @@ class OKCupid
       "bi guys only" => 16,
       "everybody" => 63
     }
-    
+
     Filters = {
       # "account_status" => 29,
       "age" => 2,
@@ -65,19 +65,19 @@ class OKCupid
       # "v_first_contact" => 27,
       # "v_looks" => 23,
       # "v_personality" => 25,
-      
+
       # filters
       'match_limit' => 'match_limit',
       'order_by' => 'order_by',
       'location' => 'location'
     }
-    
+
     RelationshipStatus = {
       'single' => 2,
       'not single' => 12,
       'any' => 0
     }
-    
+
     OrderBy = {
       'match %' => 'MATCH',
       'friend %' => 'FRIEND',
@@ -86,14 +86,14 @@ class OKCupid
       'join' => 'JOIN',
       'last login' => 'LOGIN'
     }
-    
+
     LastLogin = {
       "now" => 3600,
       "last day" => 86400,
       "last week" => 604800,
       "last month" => 2678400,
       "last year" => 31536000,
-      "last decade" => 315360000 
+      "last decade" => 315360000
     }
   end
 end
