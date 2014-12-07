@@ -133,7 +133,7 @@ class OKCupid
       
       # Stores the OKCupid server timestamp. Without this, pagination returns
       # inconsistent results.
-      @timekey = page.search('script')[0].text.match(/CurrentGMT = new Date\(([\d]+)\*[\d]+\)/).captures[0]
+      @timekey = page.search('script')[0].text[/CurrentGMT = new Date\(([\d]+)\*[\d]+\)/, 0]
       
       # OKCupid may return previously found profiles if there aren't enough
       # to fill a query or pagination, so we stop that with a set.
