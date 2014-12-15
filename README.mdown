@@ -6,15 +6,15 @@ Lonely Coder
     `Y8888888Y'
       `Y888Y'
         `Y'
-        
+
 Lonely coder seeks nice boy
 -----------------------------
     require 'lonely_coder'
     okc = OKCupid.new('thetrek','thisisntmypasswordweirdo')
-    
+
     sweet_guys = []
-    
-    ['Ann Arbor, MI', 'New York, New York', 
+
+    ['Ann Arbor, MI', 'New York, New York',
     'Chicago, Illinois', 'San Francisco, CA'].each do |maybe_here|
       sweet_guys += okc.search({
         :min_age => 25,
@@ -28,9 +28,9 @@ Lonely coder seeks nice boy
         :relationship_status => 'single' # the heart aches, but not for friends
       }).results
     end
-    
+
     sweet_guys.count # oof, 812. Let the coffee dates begin!
-    
+
 What is this nonsense?
 -----------------------------
 A ruby gem for interacting with [OKCupid](http://www.okcupid.com/). OKCupid doesn't actually have an API, so we use mechanize to interact with the site. Screen scraping isn't terribly fast, but it's pretty zippy compared to the other option – doing nothing.
@@ -47,15 +47,15 @@ Use your account
 
     require 'lonely_coder'
     okc = OKCupid.new('yourusername', 'yourpassword')
-    
+
 Once you have a connection you can check out a person's profile
-    
+
     trek = okc.profile_for('thetrek')
     trek.match # => 99. Damn, he's pretty sweet
     trek.location # => 'Ann Arbor, Michigan'
     `open #{trek.profile_thumb_urls.first}` # HOT. DAMN.
 
-Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `single`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
+Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `relationship_status`, `relationship_type`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
 
 If you don't have particular username in mind, you can search. Check `lib/magic_constants.rb` for the crazy [Magic Numbers](http://en.wikipedia.org/wiki/Magic_number_(programming\)).
 
@@ -65,7 +65,7 @@ If you don't have particular username in mind, you can search. Check `lib/magic_
       :gentation => 'guys who like guys',
       :ethnicity => ['human']
     }) # search object
-  
+
     # fires the loading of the first 10, but only limited profiles. If you'd like full
     # deets, use okc.profile_for with a results username.
     search.results
@@ -74,4 +74,4 @@ If you don't have particular username in mind, you can search. Check `lib/magic_
 What if things don't go well
 -----------------------------
 
-    okc.love(1000) # ♥ 
+    okc.love(1000) # ♥

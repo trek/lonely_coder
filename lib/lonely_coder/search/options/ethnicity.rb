@@ -5,7 +5,7 @@ class OKCupid
       values.collect {|v| MagicNumbers::Ethnicity[v.downcase]}.inject(0, :+)
     end
   end
-  
+
   class Search
     def add_ethnicity_option(values)
       @filters << EthnicityFilter.new('ethnicity', values)
