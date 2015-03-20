@@ -57,7 +57,7 @@ Once you have a connection you can check out a person's profile
 
 Go ahead and ask for `username`, `match`, `friend`, `enemy`, `location`, `age`, `sex`, `orientation`, `relationship_status`, `relationship_type`, `last_online`, `ethnicity`, `height`, `body_type`, `diet`, `smokes`,  `drinks`, `drugs`, `religion`, `sign`, `education`, `job`, `income`, `offspring`, `pets`, `speaks`, and `profile_thumb_urls`
 
-If you don't have particular username in mind, you can search. Check `lib/magic_constants.rb` for the crazy [Magic Numbers](http://en.wikipedia.org/wiki/Magic_number_(programming\)).
+If you don't have particular username in mind, you can search. Check `lib/magic_constants.rb` for the crazy [Magic Numbers](https://en.wikipedia.org/wiki/Magic_number_(programming)).
 
     search = okc.search({
       :min_age => 18,
